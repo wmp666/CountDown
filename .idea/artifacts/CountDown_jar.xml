@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="CountDown:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/CountDown_jar</output-path>
+    <root id="archive" name="CountDown.jar">
+      <element id="module-output" name="CountDown" />
+    </root>
+  </artifact>
+</component>
