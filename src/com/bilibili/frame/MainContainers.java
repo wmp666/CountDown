@@ -1,20 +1,24 @@
 package com.bilibili.frame;
 
 import com.bilibili.information.GetTime;
+import com.bilibili.information.InformationLib;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class MainContainers extends JPanel {
 
     Container container = this;
-    private static int width = 310;
+    private static int width = 300;
     private String title = " ";
     private Date startTime;//倒计时结束时间
-    private int beginTime = 0;//倒计时持续时间
+    //private int beginTime = 0;//倒计时持续时间
 
 
     //窗口信息
@@ -34,7 +38,7 @@ public class MainContainers extends JPanel {
 
     static {
         System.out.println("加载中...");
-        System.out.println("Version1.5.0");
+        System.out.println("Version1.5.1");
     }
 
     public MainContainers() {
@@ -55,34 +59,87 @@ public class MainContainers extends JPanel {
         this.isCanExit = isCanExit;
         this.isCanTop = isCanTop;
 
-
-        //initThing();
-
         setTime();
 
         initFrame();
 
+        initButton();
+
+
     }
 
+    private void initButton() {
+        //按钮集合
+        ArrayList<JButton> buttonList = new ArrayList<>();
+        buttonList.add(new JButton("刷新"));
+        buttonList.add(new JButton("设置"));
 
-/*
-    //获取倒计时文件相关信息
-    private void initThing() throws IOException {
+        //初始化按钮默认数据
+        for (int i = 0; i < buttonList.size(); i++) {
+            JButton button = buttonList.get(i);
+            button.setBackground(this.backgroundColor);
+            button.setForeground(this.titleColor);
+            button.setFont(new Font("Microsoft YaHei", Font.BOLD, 20));
+            //button.setBorder(null);//去除边框
+            button.setFocusPainted(false);//去除焦点
+            button.setOpaque(false);//去除背景
+        }
 
-        GetTimeThing getTimeThing = new GetTimeThing();
+        JButton reload = buttonList.get(0);
+        reload.addActionListener(e -> {
+            System.out.println("刷新");
+            //刷新所有数据
 
+            container.removeAll();
 
-        title = getTimeThing.getTitle();
-        startTime = getTimeThing.getAfterTime();
-        beginTime = getTimeThing.getBeginTime();
+            InformationLib informationLib;
+            try {
+                informationLib = new InformationLib(new File("information.set"));
+            } catch (IOException | ParseException ex) {
+                throw new RuntimeException(ex);
+            }
 
+            this.title = informationLib.getTitle();
+            this.startTime = informationLib.getStartTime();
 
-    }*/
+            this.timeColor = informationLib.getNumColor();
+            this.titleColor = informationLib.getTitleColor();
+            this.backgroundColor = informationLib.getBGColor();
+            this.frameType = informationLib.getFrameType();
+            this.isCanExit = informationLib.isCanExit();
+            this.isCanTop = informationLib.isCanTop();
+
+            setTime();
+
+            initFrame();
+
+            container.repaint();
+
+        });
+
+        JButton setting = buttonList.get(1);
+        setting.addActionListener(e -> {
+            JOptionPane.showMessageDialog(null,
+                    "设置",
+                    "settings",
+                    JOptionPane.INFORMATION_MESSAGE);
+        });
+
+        for (int i = 0; i < buttonList.size(); i++) {
+            JButton button = buttonList.get(i);
+            button.setBounds(i * (this.getWidth() / buttonList.size()), 178,
+                    this.getWidth() / buttonList.size(), 30);
+            container.add(buttonList.get(i));
+        }
+    }
 
     //设置倒计时时间相关数据
     protected void initContent() {
 
+        container.removeAll();
+
         long[] times = setTime();
+        initButton();
         setRightString(times[0], (int)times[1],
                 this.timeColor,
                 this.titleColor,
@@ -106,11 +163,9 @@ public class MainContainers extends JPanel {
 
         int result = Math.max(dayLength,300);
 
-        //System.out.println(titleLength + "/" + dayLength);
-        //System.out.println("结果:" + result);
-
         //将组件的宽度设为result
         this.width = result;
+
 
         return new long[]{remainTime,dayTime};
     }
@@ -181,7 +236,7 @@ public class MainContainers extends JPanel {
 
         Integer dayTime = (int)this.dayTime;
 
-        this.setSize(this.width, 175);//大小
+        this.setSize(this.width, 210);//大小
 
         container.setLayout(null);//取消默认居中
 

@@ -20,14 +20,8 @@ public class MainFrame extends JFrame{
 
         this.setVisible(true);
         //刷新
-        while (true) {
-            //setThing();
-            mainContainer.initContent();
-            mainContainer.repaint();
-            Thread.sleep(17);//反复刷新
-            mainContainer.removeAll();
 
-        }
+        new TimeThread(mainContainer).start();
     }
 
 
@@ -36,7 +30,7 @@ public class MainFrame extends JFrame{
 
         //Integer dayTime = (int)this.dayTime;
 
-        this.setSize(mainContainer.getWidth() + 20,
+        this.setSize(mainContainer.getWidth() + 10,
                 mainContainer.getHeight() + 40);//大小
         this.setAlwaysOnTop(mainContainer.getAlwaysOnTop());//置顶
         //this.setLocationRelativeTo(null);//窗口居中

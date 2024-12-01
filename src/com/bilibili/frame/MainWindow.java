@@ -26,7 +26,7 @@ public class MainWindow extends JWindow{
 
         initFrame();
 
-        JProgressBar timeProgressBar = initProgressBar();
+        //JProgressBar timeProgressBar = initProgressBar();
 
         this.setLayout(null);
 
@@ -41,7 +41,7 @@ public class MainWindow extends JWindow{
             exitButton.setBounds(mainContainer.getX()
                     , mainContainer.getY() + mainContainer.getHeight() + 10,
                     mainContainer.getWidth(), 40);
-            exitButton.setFont(new Font("微软雅黑", Font.BOLD, 23));
+            exitButton.setFont(new Font("Microsoft YaHei", Font.BOLD, 23));
 
             //设置颜色
             {
@@ -65,7 +65,7 @@ public class MainWindow extends JWindow{
             titleLabel.setBounds(mainContainer.getX() + 5,
                     mainContainer.getY() - 50,
                     300, 40);
-            titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 23));
+            titleLabel.setFont(new Font("Microsoft YaHei", Font.BOLD, 23));
 
             //设置标题颜色
             {
@@ -80,75 +80,12 @@ public class MainWindow extends JWindow{
 
         this.setVisible(true);
 
-        long startremainTime = mainContainer.getRemainTime();
-
         //刷新
-        while (true) {
-            //setThing();
-            mainContainer.initContent();
 
-            if (mainContainer.getRemainTime() < 0){
-                timeProgressBar.setIndeterminate(true);
-                Thread.sleep(1000);//反复刷新
-            }else{
-
-                //将进度条的数字设置为，倒计时剩余时间的百分比
-                int startremainTime_Min = (int) startremainTime/1000 - 960 *60;
-                int remainTime_Min = (int) mainContainer.getRemainTime()/1000 - 960*60;
-
-
-                System.out.println("剩余时间-" + remainTime_Min);
-                System.out.println("最初的剩余时间:" + startremainTime_Min);
-                double result = ((double)remainTime_Min / (double) startremainTime_Min) *100;
-                timeProgressBar.setValue((int)result);
-                System.out.println("进度条百分比:" + result);
-                System.out.println(timeProgressBar.getValue());
-
-
-                mainContainer.repaint();
-                Thread.sleep(300);//反复刷新
-                mainContainer.removeAll();
-
-            }
-
-
-
-        }
+        TimeThread timeThread = new TimeThread(mainContainer);
+        timeThread.start();
     }
 
-
-    private JProgressBar initProgressBar(){
-
-        //初始化加载条
-        JProgressBar progressBar = new JProgressBar();
-        progressBar.setBounds(0, this.getHeight() - 40,
-                this.getWidth(), 40);
-
-        //设置颜色
-        {
-            Color c;
-            Color c1;
-            if (color == 1) {
-                c = new Color(0x636363);
-                c1 = new Color(0xD1D1D1);
-            } else {
-                c = new Color(0xD1D1D1);
-                c1 = new Color(0x636363);
-            }
-            progressBar.setForeground(c);
-            progressBar.setBackground(c1);
-        }
-
-        //去除边框
-        progressBar.setBorderPainted(false);
-        progressBar.setStringPainted(true);
-        progressBar.setFont(new Font("微软雅黑", Font.BOLD, 23));
-        progressBar.setIndeterminate(false);
-
-        this.getContentPane().add(progressBar);
-        return progressBar;
-
-    }
     private void initFrame() {
 
 
