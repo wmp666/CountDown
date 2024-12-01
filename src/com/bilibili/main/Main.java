@@ -8,7 +8,6 @@ import com.bilibili.information.GetScreenSize;
 import com.bilibili.information.InformationLib;
 
 import javax.swing.*;
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 //import com.bilibili.frame.MainPro;
@@ -17,7 +16,7 @@ public class Main {
     public static void main(String[] args) throws InterruptedException, IOException, ParseException {
         System.out.println("Hello world!");
 
-        InformationLib inf = new InformationLib(new File("information.set"));
+        InformationLib inf = new InformationLib();
 
 
 

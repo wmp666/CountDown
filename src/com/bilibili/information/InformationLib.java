@@ -10,7 +10,8 @@ import java.util.Date;
 
 public class InformationLib {
 
-    private File InfPath;
+    private final static File InfPath = new File("information.set");
+    private String allThing;
 
     private String title;
     private Date startTime;
@@ -26,29 +27,14 @@ public class InformationLib {
     private Color titleColor;
     private Color BGColor;
 
+
     //将数据以空格分成三段
     //1-天数的颜色
     //2-标题的颜色
     //3-背景的颜色
 
-    public InformationLib() {
-    }
+    public InformationLib() throws IOException, ParseException {
 
-    public InformationLib(String title, Date startTime,
-                          int frameType, boolean isCanExit, boolean isCanTop,
-                          Color numColor, Color titleColor, Color BGColor) {
-        this.title = title;
-        this.startTime = startTime;
-        this.frameType = frameType;
-        this.isCanExit = isCanExit;
-        this.isCanTop = isCanTop;
-        NumColor = numColor;
-        this.titleColor = titleColor;
-        this.BGColor = BGColor;
-    }
-
-    public InformationLib(File infPath) throws IOException, ParseException {
-        this.InfPath = infPath;
 
         boolean b = !(InfPath.exists());
         while (b){
@@ -73,6 +59,7 @@ public class InformationLib {
 
         FileInputStream fis = new FileInputStream(InfPath);
         String s = new String(fis.readAllBytes(),"UTF-8");
+        this.allThing = s;
         System.out.println(s);
 
         String[] tempInf = s.split("\\n");
@@ -147,6 +134,21 @@ public class InformationLib {
         fis.close();
     }
 
+    public InformationLib(String title, Date startTime,
+                          int frameType, boolean isCanExit, boolean isCanTop,
+                          Color numColor, Color titleColor, Color BGColor) {
+        this.title = title;
+        this.startTime = startTime;
+        this.frameType = frameType;
+        this.isCanExit = isCanExit;
+        this.isCanTop = isCanTop;
+        NumColor = numColor;
+        this.titleColor = titleColor;
+        this.BGColor = BGColor;
+    }
+
+
+
     //遍历数组
     private static void traver(String[] temp) {
 
@@ -169,6 +171,13 @@ public class InformationLib {
                 TitleColor:000000
                 BGColor:FFFFFF
                 """.getBytes(StandardCharsets.UTF_8));
+        fos.close();
+    }
+
+    public void addInf(String allThing) throws IOException {
+        this.allThing = allThing;
+        FileOutputStream fos = new FileOutputStream(InfPath);
+        fos.write(allThing.getBytes(StandardCharsets.UTF_8));
         fos.close();
     }
 
@@ -240,7 +249,13 @@ public class InformationLib {
         return InfPath;
     }
 
-    public void setInfPath(File infPath) {
-        InfPath = infPath;
+
+
+    public String getAllThing() {
+        return allThing;
+    }
+
+    public void setAllThing(String allThing) {
+        this.allThing = allThing;
     }
 }

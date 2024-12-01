@@ -5,7 +5,8 @@ import com.bilibili.information.InformationLib;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -88,49 +89,109 @@ public class MainContainers extends JPanel {
         JButton reload = buttonList.get(0);
         reload.addActionListener(e -> {
             System.out.println("刷新");
-            //刷新所有数据
 
-            container.removeAll();
-
-            InformationLib informationLib;
             try {
-                informationLib = new InformationLib(new File("information.set"));
+                reload();
             } catch (IOException | ParseException ex) {
                 throw new RuntimeException(ex);
             }
-
-            this.title = informationLib.getTitle();
-            this.startTime = informationLib.getStartTime();
-
-            this.timeColor = informationLib.getNumColor();
-            this.titleColor = informationLib.getTitleColor();
-            this.backgroundColor = informationLib.getBGColor();
-            this.frameType = informationLib.getFrameType();
-            this.isCanExit = informationLib.isCanExit();
-            this.isCanTop = informationLib.isCanTop();
-
-            setTime();
-
-            initFrame();
-
-            container.repaint();
 
         });
 
         JButton setting = buttonList.get(1);
         setting.addActionListener(e -> {
-            JOptionPane.showMessageDialog(null,
-                    "设置",
-                    "settings",
-                    JOptionPane.INFORMATION_MESSAGE);
+
+            JDialog settingsDialog = new JDialog();
+            settingsDialog.setTitle("设置");
+
+            settingsDialog.setLayout(null);
+            //居中
+            settingsDialog.setLocationRelativeTo(null);
+            //大小
+            settingsDialog.setSize(470, 340);
+            //设置图标
+            settingsDialog.setIconImage(Toolkit.getDefaultToolkit().getImage("lib\\image\\icon.png"));
+
+            SettingsPanel settingsPanel;
+            try {
+                settingsPanel = new SettingsPanel();
+                settingsDialog.getContentPane().add(settingsPanel.getPanel());
+            } catch (IOException | ParseException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            settingsDialog.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+
+
+                    int i = JOptionPane.showConfirmDialog(null,
+                            "将数据保存,并刷新？",
+                            "询问",
+                            JOptionPane.YES_NO_OPTION);
+                    if (i == 0) {
+                        InformationLib informationLib;
+                        try {
+                            informationLib = new InformationLib();
+                            //输入新数据
+                            informationLib.addInf(settingsPanel.getAllThing());
+                        } catch (IOException | ParseException ex) {
+                            throw new RuntimeException(ex);
+                        }
+
+                        try {
+                            reload();
+                        } catch (IOException | ParseException ex) {
+                            throw new RuntimeException(ex);
+                        }
+
+                    }
+                }
+
+            });
+
+            settingsDialog.setAlwaysOnTop(true);
+            settingsDialog.setResizable(false);
+            settingsDialog.setVisible(true);
+
+
         });
 
         for (int i = 0; i < buttonList.size(); i++) {
             JButton button = buttonList.get(i);
             button.setBounds(i * (this.getWidth() / buttonList.size()), 178,
-                    this.getWidth() / buttonList.size(), 30);
+                    this.getWidth() / buttonList.size(), 35);
             container.add(buttonList.get(i));
         }
+    }
+
+    private void reload() throws IOException, ParseException {
+
+
+        //刷新所有数据
+
+        container.removeAll();
+
+        InformationLib informationLib;
+
+            informationLib = new InformationLib();
+
+
+        this.title = informationLib.getTitle();
+        this.startTime = informationLib.getStartTime();
+
+        this.timeColor = informationLib.getNumColor();
+        this.titleColor = informationLib.getTitleColor();
+        this.backgroundColor = informationLib.getBGColor();
+        this.frameType = informationLib.getFrameType();
+        this.isCanExit = informationLib.isCanExit();
+        this.isCanTop = informationLib.isCanTop();
+
+        setTime();
+
+        initFrame();
+
+        container.repaint();
     }
 
     //设置倒计时时间相关数据
