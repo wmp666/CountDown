@@ -10,13 +10,10 @@ public class MainWindow extends JWindow{
 
     MainContainers mainContainer = new MainContainers();
 
-    private int color;
     private Color[] colors = new Color[3];
 
-    public MainWindow(MainContainers MainContainer,int color) throws IOException, InterruptedException {
+    public MainWindow(MainContainers MainContainer,int type) throws IOException, InterruptedException {
 
-        this.color = color;
-        //color 0:黑色 1:白色
 
         this.mainContainer = MainContainer;
 
@@ -24,7 +21,7 @@ public class MainWindow extends JWindow{
         colors[1] = mainContainer.getTitleColor();
         colors[2] = mainContainer.getBackgroundColor();
 
-        initFrame();
+        initFrame(type);
 
         //JProgressBar timeProgressBar = initProgressBar();
 
@@ -32,10 +29,9 @@ public class MainWindow extends JWindow{
 
 
 
-        mainContainer.setLocation((this.getWidth() - mainContainer.getWidth())/2,
-                (this.getHeight() - mainContainer.getHeight())/2 - 40);
+        mainContainer.setLocation(0, 0);
 
-        //关闭按钮
+        /*//关闭按钮
         {
             JButton exitButton = new JButton("关闭");
             exitButton.setBounds(mainContainer.getX()
@@ -52,6 +48,7 @@ public class MainWindow extends JWindow{
             exitButton.addActionListener(e -> System.exit(0));
             this.getContentPane().add(exitButton);
         }
+*/
 
         //设置背景
         {
@@ -59,11 +56,11 @@ public class MainWindow extends JWindow{
             this.getContentPane().setBackground(colors[2]);
         }
 
-        //标题标签
+        /*//标题标签
         {
             JLabel titleLabel = new JLabel(mainContainer.getTitle() + "倒计时");
-            titleLabel.setBounds(mainContainer.getX() + 5,
-                    mainContainer.getY() - 50,
+            titleLabel.setBounds(0,
+                    0,
                     300, 40);
             titleLabel.setFont(new Font("Microsoft YaHei", Font.BOLD, 23));
 
@@ -74,7 +71,7 @@ public class MainWindow extends JWindow{
             }
 
             this.getContentPane().add(titleLabel);
-        }
+        }*/
 
         this.getContentPane().add(mainContainer);
 
@@ -86,16 +83,26 @@ public class MainWindow extends JWindow{
         timeThread.start();
     }
 
-    private void initFrame() {
+    private void initFrame(int type) {
 
 
         //获取屏幕大小
         int screenWidth = new GetScreenSize().getScreenWidth();
         int screenHeight = new GetScreenSize().getScreenHeight();
 
-        this.setSize(screenWidth, screenHeight);//大小
+        System.out.println(1);
+        if (type == 0) {
+            System.out.println(2);
+            this.setSize(screenWidth, screenHeight);//大小
 
-        this.setLocation(0, 0);
+            this.setLocation(0, 0);
+
+        }else{
+            System.out.println(3);
+            this.setLocation(screenWidth - mainContainer.getWidth(), 2);
+            this.setSize(mainContainer.getWidth(),
+                    mainContainer.getHeight());//大小
+        }
 
         this.setAlwaysOnTop(mainContainer.getAlwaysOnTop());//置顶
 

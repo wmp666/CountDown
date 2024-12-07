@@ -2,7 +2,6 @@ package com.bilibili.main;
 
 import com.bilibili.frame.MainContainers;
 import com.bilibili.frame.MainDialog;
-import com.bilibili.frame.MainFrame;
 import com.bilibili.frame.MainWindow;
 import com.bilibili.information.GetScreenSize;
 import com.bilibili.information.InformationLib;
@@ -39,12 +38,9 @@ public class Main {
                 new MainDialog(mainContainer);
             }
             case 1 ->{
-                new MainFrame(mainContainer);
-            }
-            case 2 ->{
                 new MainWindow(mainContainer,1);
             }
-            case 3 ->{
+            case 2 ->{
                 new MainWindow(mainContainer,0);
             }
             default -> JOptionPane.showMessageDialog(null,

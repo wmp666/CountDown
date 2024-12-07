@@ -39,7 +39,7 @@ public class MainContainers extends JPanel {
 
     static {
         System.out.println("加载中...");
-        System.out.println("Version1.5.1");
+        System.out.println("Version1.5.2");
     }
 
     public MainContainers() {
@@ -72,6 +72,7 @@ public class MainContainers extends JPanel {
     private void initButton() {
         //按钮集合
         ArrayList<JButton> buttonList = new ArrayList<>();
+        buttonList.add(new JButton("关闭"));
         buttonList.add(new JButton("刷新"));
         buttonList.add(new JButton("设置"));
 
@@ -86,82 +87,117 @@ public class MainContainers extends JPanel {
             button.setOpaque(false);//去除背景
         }
 
-        JButton reload = buttonList.get(0);
-        reload.addActionListener(e -> {
-            System.out.println("刷新");
+        {
+            JButton close = buttonList.get(0);
+            close.setForeground(Color.red);
+            //设置按钮是否可以使用
 
-            try {
-                reload();
-            } catch (IOException | ParseException ex) {
-                throw new RuntimeException(ex);
-            }
+            close.addActionListener(e -> {
 
-        });
-
-        JButton setting = buttonList.get(1);
-        setting.addActionListener(e -> {
-
-            JDialog settingsDialog = new JDialog();
-            settingsDialog.setTitle("设置");
-
-            settingsDialog.setLayout(null);
-            //居中
-            settingsDialog.setLocationRelativeTo(null);
-            //大小
-            settingsDialog.setSize(470, 340);
-            //设置图标
-            settingsDialog.setIconImage(Toolkit.getDefaultToolkit().getImage("lib\\image\\icon.png"));
-
-            SettingsPanel settingsPanel;
-            try {
-                settingsPanel = new SettingsPanel();
-                settingsDialog.getContentPane().add(settingsPanel.getPanel());
-            } catch (IOException | ParseException ex) {
-                throw new RuntimeException(ex);
-            }
-
-            settingsDialog.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-
-
+                if (isCanExit) {
                     int i = JOptionPane.showConfirmDialog(null,
-                            "将数据保存,并刷新？",
+                            "确定关闭？",
                             "询问",
                             JOptionPane.YES_NO_OPTION);
                     if (i == 0) {
-                        InformationLib informationLib;
-                        try {
-                            informationLib = new InformationLib();
-                            //输入新数据
-                            informationLib.addInf(settingsPanel.getAllThing());
-                        } catch (IOException | ParseException ex) {
-                            throw new RuntimeException(ex);
-                        }
-
-                        try {
-                            reload();
-                        } catch (IOException | ParseException ex) {
-                            throw new RuntimeException(ex);
-                        }
-
+                        System.exit(0);
                     }
+                }else{
+                    JOptionPane.showMessageDialog(null,
+                            "用户禁止关闭",
+                            "通知",
+                            JOptionPane.ERROR_MESSAGE);
                 }
 
             });
+        }
 
-            settingsDialog.setAlwaysOnTop(true);
-            settingsDialog.setResizable(false);
-            settingsDialog.setVisible(true);
+        {
+            JButton reload = buttonList.get(1);
+            reload.addActionListener(e -> {
+                System.out.println("刷新");
+
+                try {
+                    reload();
+                } catch (IOException | ParseException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+            });
+        }
+
+        {
+            JButton setting = buttonList.get(2);
+            setting.addActionListener(e -> {
+
+                JDialog settingsDialog = new JDialog();
+                settingsDialog.setTitle("设置");
+
+                settingsDialog.setLayout(null);
+                //居中
+                settingsDialog.setLocationRelativeTo(null);
+                //大小
+                settingsDialog.setSize(470, 340);
+                //设置图标
+                settingsDialog.setIconImage(Toolkit.getDefaultToolkit().getImage("lib\\image\\icon.png"));
+
+                SettingsPanel settingsPanel;
+                try {
+                    settingsPanel = new SettingsPanel();
+                    settingsDialog.getContentPane().add(settingsPanel.getPanel());
+                } catch (IOException | ParseException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+                settingsDialog.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
 
 
-        });
+                        int i = JOptionPane.showConfirmDialog(null,
+                                "将数据保存,并刷新？",
+                                "询问",
+                                JOptionPane.YES_NO_OPTION);
+                        if (i == 0) {
+                            InformationLib informationLib;
+                            try {
+                                informationLib = new InformationLib();
+                                //输入新数据
+                                informationLib.addInf(settingsPanel.getAllThing());
+                            } catch (IOException | ParseException ex) {
+                                throw new RuntimeException(ex);
+                            }
+
+                            try {
+                                reload();
+                            } catch (IOException | ParseException ex) {
+                                throw new RuntimeException(ex);
+                            }
+
+                        }
+                    }
+
+                });
+
+                settingsDialog.setResizable(false);
+                settingsDialog.setVisible(true);
+
+
+            });
+        }
+
 
         for (int i = 0; i < buttonList.size(); i++) {
             JButton button = buttonList.get(i);
+            //去除边框
+            button.setBorder(null);
             button.setBounds(i * (this.getWidth() / buttonList.size()), 178,
                     this.getWidth() / buttonList.size(), 35);
+            if ((i + 1)%2 == 0) {
+                button.setBackground(new Color(0x919191));
+            }
             container.add(buttonList.get(i));
+
         }
     }
 
@@ -170,7 +206,7 @@ public class MainContainers extends JPanel {
 
         //刷新所有数据
 
-        container.removeAll();
+        //container.removeAll();
 
         InformationLib informationLib;
 

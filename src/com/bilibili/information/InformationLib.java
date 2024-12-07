@@ -1,16 +1,23 @@
 package com.bilibili.information;
 
+import com.bilibili.exception.InfLackErrorException;
+
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Set;
 
 public class InformationLib {
 
-    private final static File InfPath = new File("information.set");
+    private static File InfPath = null;
     private String allThing;
 
     private String title;
@@ -35,6 +42,16 @@ public class InformationLib {
 
     public InformationLib() throws IOException, ParseException {
 
+        String userHomeDir = System.getProperty("user.home");
+        StringBuilder stringBuilder = new StringBuilder(userHomeDir);
+        stringBuilder.append("\\AppData\\Roaming\\CountDown");
+        InfPath = new File(stringBuilder.toString());
+        boolean creativeDirB = InfPath.mkdirs();
+        System.out.println("文件夹CountDown是否存在" + !creativeDirB);
+        InfPath = new File(InfPath.getPath() + "\\information.set");
+
+
+        System.out.println(userHomeDir);
 
         boolean b = !(InfPath.exists());
         while (b){
@@ -68,7 +85,7 @@ public class InformationLib {
         traver(tempInf);
 
         //查错
-        if(tempInf.length != 8){
+        if(tempInf.length != 7){
             JOptionPane.showMessageDialog(null,
                     "information.set文件中,数据数量错误,建议更正",
                     "error",
@@ -99,36 +116,218 @@ public class InformationLib {
         }
 
 
-        String[] tempInf02 = new String[tempInf.length];
+        //String[] tempInf02 = new String[tempInf.length];
+
+        HashMap<String,String> tempInf02 = new HashMap<>();
         //处理数据
         for (int i = 0; i < tempInf.length; i++) {
-            tempInf02[i] = tempInf[i].split(":")[1];
+            String[] temp = tempInf[i].split(":");
+            tempInf02.put(temp[0],temp[1]);
         }
 
         //遍历数组tempInf02
         traver(tempInf02);
 
-        title = tempInf02[0];
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
-        startTime = dateFormat.parse(tempInf02[1]);
-        frameType = Integer.parseInt(tempInf02[2]);
-        if (tempInf02[3] == "true"){
-            isCanExit = true;
-        }else if (tempInf02[3] == "false"){
-            isCanExit = false;
-        }
+        try {
+            //数据分类
+            Set<String> keySet = tempInf02.keySet();
+            for (String key : keySet) {
+                switch (key){
+                    case "Title"->{
+                        title = tempInf02.get(key);
+                    }
+                    case "StartTime"->{
+                        //开始时间
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+                        startTime = dateFormat.parse(tempInf02.get(key));
+                    }
+                    case "FrameType"->{
+                        //窗口类型
+                        switch (tempInf02.get(key)){
+                            case "dialog"->{
+                                frameType = 0;
+                            }
+                            case "window"->{
+                                frameType = 1;
+                            }
+                            case "screen"->{
+                                frameType = 2;
+                            }
+                            default->{
+                                throw new InfLackErrorException("Unexpected value: FrameType->" + tempInf02.get(key));
+                            }
+                        }
+                    }
+                    case "IsCanExit"->{
+                        //是否可以关闭
+                        switch (tempInf02.get(key)){
+                            case "true"->{
+                                isCanExit = true;
+                            }
 
-        if (tempInf02[4] == "true"){
-            isCanTop = true;
-        }else if (tempInf02[4] == "false"){
-            isCanTop = false;
+                            case "false"->{
+                                isCanExit = false;
+                            }
+                            default->{
+                                throw new InfLackErrorException("Unexpected value: IsCanExit->" + tempInf02.get(key));
+                            }
+                        }
+                    }
+                    case "IsTop"->{
+                        //是否置顶
+                        switch (tempInf02.get(key)){
+                            case "true"->{
+                                isCanTop = true;
+                            }
+                            case "false"->{
+                                isCanTop = false;
+                            }
+                            default->{
+                                throw new InfLackErrorException("Unexpected value: IsCanTop->" + tempInf02.get(key));
+                            }
+                        }
+                    }
+                    case "NumColor"->{
+                        //数字颜色
+                        switch (tempInf02.get("NumColor")){
+                            case "white"->{
+                                NumColor = Color.WHITE;
+                            }
+                            case "black"->{
+                                NumColor = Color.BLACK;
+                            }
+                            case "blue"->{
+                                NumColor = new Color(0X48CCFF);
+                            }
+                            case "red"->{
+                                NumColor = new Color(0XFF4D4D);
+                            }
+                            case "green"->{
+                                NumColor = new Color(0X4DFF4D);
+                            }
+                            default->{
+                                throw new InfLackErrorException("Unexpected value: NumColor->" + tempInf02.get("NumColor"));
+                            }
+
+                        }
+                    }
+                    case "MainTheme"->{
+                        //主题颜色
+                        switch (tempInf02.get("MainTheme")){
+                            case "white"->{
+                                BGColor = Color.WHITE;
+                                titleColor = Color.BLACK;
+                            }
+                            case "black"->{
+                                BGColor = Color.BLACK;
+                                titleColor = Color.WHITE;
+                            }
+                            default -> {
+                                throw new InfLackErrorException("Unexpected value: MainTheme->" + tempInf02.get("MainTheme"));
+                            }
+
+                        }
+                    }
+                    default -> {
+                        throw new InfLackErrorException("出现错误数据指向");
+                    }
+                }
+                //System.out.println(key + ":" + tempInf02.get(key));
+            }
+            /*//标题
+            title = tempInf02.get("Title");
+            //开始时间
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+            startTime = dateFormat.parse(tempInf02.get("StartTime"));
+            //窗口类型
+            switch (tempInf02.get("FrameType")){
+                case "dialog"->{
+                    frameType = 0;
+                }
+                case "window"->{
+                    frameType = 1;
+                }
+                case "screen"->{
+                    frameType = 2;
+                }
+                default->{
+                    throw new InfLackErrorException("Unexpected value: FrameType->" + tempInf02.get("FrameType"));
+                }
+            }
+
+            //是否可以关闭
+            switch (tempInf02.get("IsCanExit")){
+                case "true"->{
+                    isCanExit = true;
+                }
+
+                case "false"->{
+                    isCanExit = false;
+                }
+                default->{
+                    throw new InfLackErrorException("Unexpected value: IsCanExit->" + tempInf02.get("IsCanExit"));
+                }
+            }
+
+            //是否置顶
+            switch (tempInf02.get("IsTop")){
+                case "true"->{
+                    isCanTop = true;
+                }
+                case "false"->{
+                    isCanTop = false;
+                }
+                default->{
+                    throw new InfLackErrorException("Unexpected value: IsTop->" + tempInf02.get("IsTop"));
+                }
+            }
+            //数字颜色
+            switch (tempInf02.get("NumColor")){
+                    case "white"->{
+                        NumColor = Color.WHITE;
+                    }
+                    case "black"->{
+                        NumColor = Color.BLACK;
+                    }
+                    case "blue"->{
+                        NumColor = new Color(0X48CCFF);
+                    }
+                    case "red"->{
+                        NumColor = new Color(0XFF4D4D);
+                    }
+                    case "green"->{
+                        NumColor = new Color(0X4DFF4D);
+                    }
+                    default->{
+                        throw new InfLackErrorException("Unexpected value: NumColor->" + tempInf02.get("NumColor"));
+                    }
+
+                }
+
+            //主题颜色
+            switch (tempInf02.get("MainTheme")){
+                    case "white"->{
+                        BGColor = Color.WHITE;
+                        titleColor = Color.BLACK;
+                    }
+                    case "black"->{
+                        BGColor = Color.BLACK;
+                        titleColor = Color.WHITE;
+                    }
+                    default -> {
+                        throw new InfLackErrorException("Unexpected value: MainTheme->" + tempInf02.get("MainTheme"));
+                    }
+
+                }*/
+
+
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }catch (InfLackErrorException e) {
+
+            addInf();
+            throw new InfLackErrorException("出现错误数据或缺失数据");
         }
-        int temp01 = Integer.parseInt(tempInf02[5], 16);
-        NumColor = new Color(temp01);
-        int temp02 = Integer.parseInt(tempInf02[6], 16);
-        titleColor = new Color(temp02);
-        int temp03 = Integer.parseInt(tempInf02[7], 16);
-        BGColor = new Color(temp03);
 
 
         fis.close();
@@ -159,17 +358,26 @@ public class InformationLib {
         System.out.println("遍历结束========");
     }
 
+    //遍历数组
+    private static <K,T> void traver(HashMap<K,T> temp) {
+
+        System.out.println("遍历数组========");
+
+            System.out.println(temp);
+
+        System.out.println("遍历结束========");
+    }
+
     private void addInf() throws IOException {
         FileOutputStream fos = new FileOutputStream(InfPath);
         fos.write("""
                 Title:标题
                 StartTime:2026-01-01 00-00-00
-                FrameType:1
+                FrameType:window
                 IsCanExit:true
-                IsCanTop:true
-                NumColor:48CCFF
-                TitleColor:000000
-                BGColor:FFFFFF
+                IsTop:false
+                MainTheme:white
+                NumColor:blue
                 """.getBytes(StandardCharsets.UTF_8));
         fos.close();
     }
@@ -185,77 +393,54 @@ public class InformationLib {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+
 
     public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
+
 
     public int getFrameType() {
         return frameType;
     }
 
-    public void setFrameType(int frameType) {
-        this.frameType = frameType;
-    }
+
 
     public boolean isCanExit() {
         return isCanExit;
     }
 
-    public void setCanExit(boolean canExit) {
-        isCanExit = canExit;
-    }
+
 
     public boolean isCanTop() {
         return isCanTop;
     }
 
-    public void setCanTop(boolean canTop) {
-        isCanTop = canTop;
-    }
+
 
     public Color getNumColor() {
         return NumColor;
     }
 
-    public void setNumColor(Color numColor) {
-        NumColor = numColor;
-    }
+
 
     public Color getTitleColor() {
         return titleColor;
     }
 
-    public void setTitleColor(Color titleColor) {
-        this.titleColor = titleColor;
-    }
+
 
     public Color getBGColor() {
         return BGColor;
-    }
-
-    public void setBGColor(Color BGColor) {
-        this.BGColor = BGColor;
     }
 
     public File getInfPath() {
         return InfPath;
     }
 
-
-
     public String getAllThing() {
         return allThing;
     }
 
-    public void setAllThing(String allThing) {
-        this.allThing = allThing;
-    }
 }
