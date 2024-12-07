@@ -20,9 +20,9 @@ public class TimeThread extends Thread{
                 Thread.sleep(600);//反复刷新
             } catch (InterruptedException e) {
                 System.out.println("线程异常");
-
                 throw new RuntimeException(e);
             }
+
             //mainContainer.removeAll();
 
         }

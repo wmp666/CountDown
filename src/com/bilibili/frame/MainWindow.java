@@ -77,6 +77,11 @@ public class MainWindow extends JWindow{
 
         this.setVisible(true);
 
+        if (type == 0){
+            mainContainer.setLocation((this.getWidth() - mainContainer.getWidth())/2,
+                        (this.getHeight()- mainContainer.getHeight())/2);
+        }
+
         //刷新
 
         TimeThread timeThread = new TimeThread(mainContainer);
@@ -91,20 +96,20 @@ public class MainWindow extends JWindow{
         int screenHeight = new GetScreenSize().getScreenHeight();
 
         System.out.println(1);
-        if (type == 0) {
+        if (type == 0) {//全屏
             System.out.println(2);
             this.setSize(screenWidth, screenHeight);//大小
 
             this.setLocation(0, 0);
 
-        }else{
+        }else{//小窗
             System.out.println(3);
             this.setLocation(screenWidth - mainContainer.getWidth(), 2);
             this.setSize(mainContainer.getWidth(),
                     mainContainer.getHeight());//大小
         }
 
-        this.setAlwaysOnTop(mainContainer.getAlwaysOnTop());//置顶
+        //this.setAlwaysOnTop(mainContainer.getAlwaysOnTop());//置顶
 
 
     }

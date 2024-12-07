@@ -47,14 +47,8 @@ public class MainDialog extends JDialog{
         //设置任务栏的图标
         setIconImage(Toolkit.getDefaultToolkit().getImage("lib\\image\\icon.png"));
 
-        if (!mainContainer.getCloseOperation()) {
-            //关闭模式-禁止关闭
-            this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        } else{
-            //关闭模式-退出程序
-            this.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-            System.exit(0);
-        }
+        this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
     }
 
 }

@@ -7,11 +7,13 @@ import com.bilibili.information.GetScreenSize;
 import com.bilibili.information.InformationLib;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.text.ParseException;
 //import com.bilibili.frame.MainPro;
 
 public class Main {
+    static Window win;
     public static void main(String[] args) throws InterruptedException, IOException, ParseException {
         System.out.println("Hello world!");
 
@@ -33,15 +35,35 @@ public class Main {
         int screenWidth = new GetScreenSize().getScreenWidth();
         int screenHeight = new GetScreenSize().getScreenHeight();
 
+        buildWin(mainContainer);
+
+    }
+
+    public static void reload(InformationLib inf) throws IOException, InterruptedException {
+
+        MainContainers mainContainer = new MainContainers(
+                inf.getTitle(),
+                inf.getStartTime(),
+                inf.getFrameType(),
+                inf.isCanExit(),
+                inf.isCanTop(),
+                inf.getNumColor(),
+                inf.getTitleColor(),
+                inf.getBGColor());
+
+        win.setVisible(false);
+        buildWin(mainContainer);
+    }
+    private static void buildWin(MainContainers mainContainer) throws IOException, InterruptedException {
         switch (mainContainer.getStartSytle()){
             case 0 ->{
-                new MainDialog(mainContainer);
+                win = new MainDialog(mainContainer);
             }
             case 1 ->{
-                new MainWindow(mainContainer,1);
+                win = new MainWindow(mainContainer,1);
             }
             case 2 ->{
-                new MainWindow(mainContainer,0);
+                win = new MainWindow(mainContainer,0);
             }
             default -> JOptionPane.showMessageDialog(null,
                     "窗口类型缺失或错误",
@@ -49,6 +71,5 @@ public class Main {
                     JOptionPane.ERROR_MESSAGE);
 
         }
-
     }
 }

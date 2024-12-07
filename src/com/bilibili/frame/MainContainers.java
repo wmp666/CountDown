@@ -2,6 +2,7 @@ package com.bilibili.frame;
 
 import com.bilibili.information.GetTime;
 import com.bilibili.information.InformationLib;
+import com.bilibili.main.Main;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,10 +13,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 public class MainContainers extends JPanel {
 
-    Container container = this;
+    private Container container = this;
     private static int width = 300;
     private String title = " ";
     private Date startTime;//倒计时结束时间
@@ -119,7 +121,7 @@ public class MainContainers extends JPanel {
 
                 try {
                     reload();
-                } catch (IOException | ParseException ex) {
+                } catch (IOException | ParseException | InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
 
@@ -140,7 +142,8 @@ public class MainContainers extends JPanel {
                 settingsDialog.setSize(470, 340);
                 //设置图标
                 settingsDialog.setIconImage(Toolkit.getDefaultToolkit().getImage("lib\\image\\icon.png"));
-
+                //窗口不可操作
+                settingsDialog.setModal(true);
                 SettingsPanel settingsPanel;
                 try {
                     settingsPanel = new SettingsPanel();
@@ -170,7 +173,7 @@ public class MainContainers extends JPanel {
 
                             try {
                                 reload();
-                            } catch (IOException | ParseException ex) {
+                            } catch (IOException | ParseException | InterruptedException ex) {
                                 throw new RuntimeException(ex);
                             }
 
@@ -201,11 +204,12 @@ public class MainContainers extends JPanel {
         }
     }
 
-    private void reload() throws IOException, ParseException {
+    private void reload() throws IOException, ParseException, InterruptedException {
 
 
         //刷新所有数据
-
+        Main.reload(new InformationLib());
+/*
         //container.removeAll();
 
         InformationLib informationLib;
@@ -227,7 +231,9 @@ public class MainContainers extends JPanel {
 
         initFrame();
 
-        container.repaint();
+        container.repaint();*/
+
+
     }
 
     //设置倒计时时间相关数据
@@ -371,5 +377,17 @@ public class MainContainers extends JPanel {
 
     public Color getBackgroundColor() {
         return backgroundColor;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        MainContainers that = (MainContainers) o;
+        return frameType == that.frameType && isCanExit == that.isCanExit && isCanTop == that.isCanTop && dayTime == that.dayTime && getRemainTime() == that.getRemainTime() && Objects.equals(getTitle(), that.getTitle()) && Objects.equals(startTime, that.startTime) && Objects.equals(getTimeColor(), that.getTimeColor()) && Objects.equals(getTitleColor(), that.getTitleColor()) && Objects.equals(getBackgroundColor(), that.getBackgroundColor());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash( getTitle(), startTime, frameType, isCanExit, isCanTop, getTimeColor(), getTitleColor(), getBackgroundColor(), dayTime, getRemainTime());
     }
 }
