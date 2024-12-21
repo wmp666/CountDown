@@ -135,7 +135,7 @@ public class MainContainers extends JPanel {
             JButton setting = buttonList.get(2);
             setting.addActionListener(e -> {
 
-
+                //new SettingsDialog();
                 Random r = new Random();
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < 6; i++) {
@@ -215,7 +215,7 @@ public class MainContainers extends JPanel {
         GetTime getTime = new GetTime();
         this.remainTime = getTime.getRemainingTime(startTime);
 
-        dayTime = (remainTime) / 1000 / 60 / 60 / 24 - 1;//获取时间
+        dayTime = (remainTime + 8 * 60 * 60 * 1000) / 1000 / 60 / 60 / 24 - 1;//获取时间
 
         if (dayTime < 0) dayTime = 0;
 
