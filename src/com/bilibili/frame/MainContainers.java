@@ -1,19 +1,19 @@
 package com.bilibili.frame;
 
+import com.bilibili.dialog.SettingsDialog;
 import com.bilibili.information.GetTime;
 import com.bilibili.information.InformationLib;
 import com.bilibili.main.Main;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Random;
 
 public class MainContainers extends JPanel {
 
@@ -41,7 +41,7 @@ public class MainContainers extends JPanel {
 
     static {
         System.out.println("加载中...");
-        System.out.println("Version1.5.2");
+        System.out.println("Version1.5.4");
     }
 
     public MainContainers() {
@@ -71,12 +71,13 @@ public class MainContainers extends JPanel {
 
     }
 
-    private void initButton() {
+    public void initButton() {
         //按钮集合
         ArrayList<JButton> buttonList = new ArrayList<>();
         buttonList.add(new JButton("关闭"));
         buttonList.add(new JButton("刷新"));
         buttonList.add(new JButton("设置"));
+        //buttonList.add(new JButton("更多"));
 
         //初始化按钮默认数据
         for (int i = 0; i < buttonList.size(); i++) {
@@ -84,7 +85,7 @@ public class MainContainers extends JPanel {
             button.setBackground(this.backgroundColor);
             button.setForeground(this.titleColor);
             button.setFont(new Font("Microsoft YaHei", Font.BOLD, 20));
-            //button.setBorder(null);//去除边框
+            button.setBorder(null);//去除边框
             button.setFocusPainted(false);//去除焦点
             button.setOpaque(false);//去除背景
         }
@@ -114,13 +115,14 @@ public class MainContainers extends JPanel {
             });
         }
 
+        //刷新
         {
             JButton reload = buttonList.get(1);
             reload.addActionListener(e -> {
                 System.out.println("刷新");
 
                 try {
-                    reload();
+                    Main.reload(new InformationLib());
                 } catch (IOException | ParseException | InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -128,116 +130,74 @@ public class MainContainers extends JPanel {
             });
         }
 
+        //设置
         {
             JButton setting = buttonList.get(2);
             setting.addActionListener(e -> {
 
-                JDialog settingsDialog = new JDialog();
-                settingsDialog.setTitle("设置");
 
-                settingsDialog.setLayout(null);
-                //居中
-                settingsDialog.setLocationRelativeTo(null);
-                //大小
-                settingsDialog.setSize(470, 340);
-                //设置图标
-                settingsDialog.setIconImage(Toolkit.getDefaultToolkit().getImage("lib\\image\\icon.png"));
-                //窗口不可操作
-                settingsDialog.setModal(true);
-                SettingsPanel settingsPanel;
+                Random r = new Random();
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < 6; i++) {
+                    sb.append(r.nextInt(10));
+                }
+                String code = " ";
+                code = sb.toString();
+                String password = JOptionPane.showInputDialog(null,
+                        "请输入密码" + code,
+                        "密码询问",
+                        JOptionPane.INFORMATION_MESSAGE);
+
                 try {
-                    settingsPanel = new SettingsPanel();
-                    settingsDialog.getContentPane().add(settingsPanel.getPanel());
-                } catch (IOException | ParseException ex) {
+                    StringBuilder sb1 = new StringBuilder();
+
+                    for (int i = code.length() - 1; i >= 0; i--) {
+                        sb1.append(code.charAt(i));
+                    }
+                    System.out.println(sb1.toString());
+                    if (password.equals(sb1.toString())){
+                        System.out.println("密码正确");
+                        new SettingsDialog();
+                    }else {
+                        JOptionPane.showMessageDialog(null,
+                                "密码错误",
+                                "密码询问",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (HeadlessException ex) {
+                    JOptionPane.showMessageDialog(null,
+                            "密码错误",
+                            "密码询问",
+                            JOptionPane.ERROR_MESSAGE);
                     throw new RuntimeException(ex);
                 }
-
-                settingsDialog.addWindowListener(new WindowAdapter() {
-                    @Override
-                    public void windowClosing(WindowEvent e) {
-
-
-                        int i = JOptionPane.showConfirmDialog(null,
-                                "将数据保存,并刷新？",
-                                "询问",
-                                JOptionPane.YES_NO_OPTION);
-                        if (i == 0) {
-                            InformationLib informationLib;
-                            try {
-                                informationLib = new InformationLib();
-                                //输入新数据
-                                informationLib.addInf(settingsPanel.getAllThing());
-                            } catch (IOException | ParseException ex) {
-                                throw new RuntimeException(ex);
-                            }
-
-                            try {
-                                reload();
-                            } catch (IOException | ParseException | InterruptedException ex) {
-                                throw new RuntimeException(ex);
-                            }
-
-                        }
-                    }
-
-                });
-
-                settingsDialog.setResizable(false);
-                settingsDialog.setVisible(true);
-
 
             });
         }
 
+        //更多
+        /*{
+            JButton more = buttonList.get(3);
+            more.addActionListener(e -> {
+                MoreDialog moreDialog = new MoreDialog();
+
+            });
+        }*/
+
 
         for (int i = 0; i < buttonList.size(); i++) {
             JButton button = buttonList.get(i);
-            //去除边框
-            button.setBorder(null);
+
             button.setBounds(i * (this.getWidth() / buttonList.size()), 178,
                     this.getWidth() / buttonList.size(), 35);
-            if ((i + 1)%2 == 0) {
-                button.setBackground(new Color(0x919191));
-            }
+
             container.add(buttonList.get(i));
 
         }
     }
 
-    private void reload() throws IOException, ParseException, InterruptedException {
-
-
-        //刷新所有数据
-        Main.reload(new InformationLib());
-/*
-        //container.removeAll();
-
-        InformationLib informationLib;
-
-            informationLib = new InformationLib();
-
-
-        this.title = informationLib.getTitle();
-        this.startTime = informationLib.getStartTime();
-
-        this.timeColor = informationLib.getNumColor();
-        this.titleColor = informationLib.getTitleColor();
-        this.backgroundColor = informationLib.getBGColor();
-        this.frameType = informationLib.getFrameType();
-        this.isCanExit = informationLib.isCanExit();
-        this.isCanTop = informationLib.isCanTop();
-
-        setTime();
-
-        initFrame();
-
-        container.repaint();*/
-
-
-    }
-
     //设置倒计时时间相关数据
-    protected void initContent() {
+    public void initContent() {
 
         container.removeAll();
 
@@ -297,7 +257,7 @@ public class MainContainers extends JPanel {
             //this.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);//关闭模式
         } else {
             /*title+*/
-            titleLabel.setText("距离" + title +"开始还剩");
+            titleLabel.setText("距离" + title +"还剩");
             titleLabel.setBounds(5, 0, this.getWidth(), 25);
             titleLabel.setFont(new Font("Microsoft YaHei", Font.BOLD, 25));
             container.add(titleLabel);//打印黑色字
@@ -344,8 +304,6 @@ public class MainContainers extends JPanel {
         container.setLayout(null);//取消默认居中
 
     }
-
-
 
     public String getTitle() {
         return title;

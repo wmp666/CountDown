@@ -12,12 +12,13 @@ public class TimeThread extends Thread{
 
         while(true)
         {
-                //setThing();
+
                 mainContainer.initContent();
+                mainContainer.initButton();
                 mainContainer.repaint();
 
             try {
-                Thread.sleep(600);//反复刷新
+                Thread.sleep(200);//反复刷新
             } catch (InterruptedException e) {
                 System.out.println("线程异常");
                 throw new RuntimeException(e);

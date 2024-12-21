@@ -107,7 +107,7 @@ public class InformationLib {
                         "提示",
                         JOptionPane.INFORMATION_MESSAGE);
 
-                String s1 = new String(fis.readAllBytes(),"UTF-8");
+                String s1 = new String(fis.readAllBytes(), StandardCharsets.UTF_8);
                 tempInf = s1.split("\\n");
             }else{
                 System.exit(0);
