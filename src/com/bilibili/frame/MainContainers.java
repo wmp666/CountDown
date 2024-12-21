@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
-import java.util.Random;
 
 public class MainContainers extends JPanel {
 
@@ -135,8 +134,8 @@ public class MainContainers extends JPanel {
             JButton setting = buttonList.get(2);
             setting.addActionListener(e -> {
 
-                //new SettingsDialog();
-                Random r = new Random();
+                new SettingsDialog();
+                /*Random r = new Random();
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < 6; i++) {
                     sb.append(r.nextInt(10));
@@ -170,7 +169,7 @@ public class MainContainers extends JPanel {
                             "密码询问",
                             JOptionPane.ERROR_MESSAGE);
                     throw new RuntimeException(ex);
-                }
+                }*/
 
             });
         }
